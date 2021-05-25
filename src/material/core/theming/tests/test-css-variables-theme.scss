@@ -32,3 +32,22 @@
   ));
   @include all-theme.all-component-themes(replace-all-values($theme, var(--test-var)));
 }
+
+@function -test-theme-lookup($hue, $opacity, $type: 'color') {
+  @if ($type == 'alpha') {
+    @return 'var(--test-#{$hue}-alpha)';
+  }
+  @return 'rgba(var(--test-#{$hue}-rgb), #{if($opacity == null, 'var(--test-#{$hue}-alpha)', $opacity)})'
+}
+
+._demo-css-functions-theme {
+  $palette: theming.define-palette(palette.$blue-grey-palette);
+  $theme: theming.define-dark-theme((
+    color: (
+      primary: meta.get-function('-test-theme-lookup'),
+      accent: meta.get-function('-test-theme-lookup'),
+      warn: meta.get-function('-test-theme-lookup')
+    )
+  ));
+  @include all-theme.all-component-themes($theme);
+}

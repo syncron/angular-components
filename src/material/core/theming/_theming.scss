@@ -74,6 +74,13 @@ $_emitted-density: () !default;
     @return get-color-from-palette($palette, default, $hue);
   }
 
+  @if (meta.type-of($palette) == function) {
+    // Allow putting hook functions into the palette, so that the author
+    // can implement custom logic for changing the opacity, e.g. you can use 
+    // CSS variables and  CSS rgba() expression to implement this.
+    @return meta.call($palette, $hue, $opacity: $opacity, $type: 'color');
+  }
+
   $color: map.get($palette, $hue);
 
   @if (meta.type-of($color) != color) {
@@ -84,6 +91,22 @@ $_emitted-density: () !default;
   }
 
   @return rgba($color, if($opacity == null, opacity($color), $opacity));
+}
+
+@function get-opacity-from-palette($palette, $hue: default) {
+  @if (meta.type-of($palette) == function) {
+    // Allow putting hook functions into the palette, so that the author
+    // can implement custom logic for changing the opacity, e.g. you can use 
+    // CSS variables and  CSS rgba() expression to implement this.
+    @return meta.call($palette, $hue, $opacity: null, $type: 'opacity');
+  }
+
+  $color: map.get($palette, $hue);
+  @if (meta.type-of($color) != color) {
+    @return 1; // Fallback for cases when $color is not a SCSS color
+  }
+
+  @return opacity($color);
 }
 
 // Validates the specified theme by ensuring that the optional color config defines
